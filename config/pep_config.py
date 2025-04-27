@@ -21,7 +21,7 @@ def get_config():
 
     parse.add_argument('-batch_size', type=int, default=256,
                        help='Batch size')
-    parse.add_argument('-epochs', type=int, default=1)  # 50
+    parse.add_argument('-epochs', type=int, default=200)  # 50
     parse.add_argument('-learning_rate', type=float, default=0.0018)
     parse.add_argument('-threshold', type=float, default=0.6)
     parse.add_argument('-criterion', type=list, default=[FocalDiceLoss(), torch.nn.BCEWithLogitsLoss(),ConLoss()])
