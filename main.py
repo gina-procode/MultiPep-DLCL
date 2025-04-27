@@ -101,11 +101,6 @@ def main():
         CV=False
     )
     print("\n Data is loaded...")
-    try:
-        load_and_test_pretrained(test_datasets[0])
-    except FileNotFoundError as e:
-        print(f"\nWarning: {e}\n Proceeding with new model training directly")
-     
     get_random_seed(20230226)
     torch.backends.cudnn.deterministic = True
     print("\n" + "="*50)
@@ -186,33 +181,5 @@ def main():
             test_score = [aim / len(subtests), cov / len(subtests), acc / len(subtests), ab_true / len(subtests),
                           ab_false / len(subtests)]
             save_results('average', None, start_time, run_time, test_score, title1, file_path)
-def load_and_test_pretrained(test_dataset):
-    get_random_seed(20230226)
-    print("\n" + "="*50)
-    print("Loading the trained model for testing...")
-    model = DLCL().to(DEVICE)
-    pretrained_path = "saved_models/model.pth"
-    
-    if not os.path.exists(pretrained_path):
-        raise FileNotFoundError(f"Trained model not found, please confirm the path: {pretrained_path}")
-    with torch.no_grad():
-        model.load_state_dict(torch.load(pretrained_path, map_location=DEVICE))
-        model.eval()
-    
-   
-        model_predictions, true_labels = predict(model, test_dataset, device=DEVICE)
-        test_score = estimate.evaluate(model_predictions, true_labels, threshold=pep_config.get_config().threshold)
-    
-    
-    print("\n Results of the trained model:")
-    print(f'Aiming: {test_score[0]:.3f}')
-    print(f'Coverage: {test_score[1]:.3f}')
-    print(f'Accuracy: {test_score[2]:.3f}')
-    print(f'Absolute_True: {test_score[3]:.3f}')
-    print(f'Absolute_False: {test_score[4]:.3f}')
-    print("="*50 + "\n")
-    del model
-    torch.cuda.empty_cache()  
-
 if __name__ == '__main__':
     main()

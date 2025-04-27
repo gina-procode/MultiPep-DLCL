@@ -58,7 +58,7 @@ python main.py
 ```
 
 ### Testing
-We have saved the trained model parameters in the file `save_models/model.pth`. If you are unable to fully replicate our training environment during your training process, you can load the pre-trained parameters we provided and use our model directly. Additionally, we have provided a Jupyter Notebook file named `demo.ipynb`, which includes a demo of loading model weights and making predictions, along with the results.
+We have saved the trained model parameters in the file `savemodels/model.pth`. If you are unable to fully replicate our training environment during your training process, you can separately download the pre-trained parameters provided by us from the `savemodels/model.pth` in this GitHub project and use our model directly. Additionally, we have provided a Jupyter Notebook file named `demo.ipynb`, which includes a demonstration of the process of loading our model weights and making predictions, as well as showcasing the prediction results of our model.
 
 ## Contact
 Please feel free to contact us if you need any help.
