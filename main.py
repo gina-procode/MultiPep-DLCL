@@ -16,6 +16,7 @@ from DataLoad import data_load
 from train import DataTrain, predict, CosineScheduler
 import numpy as np
 import  random
+import sys
 def get_random_seed(seed):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -26,8 +27,9 @@ def get_random_seed(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-
-
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# 添加项目根目录到Python路径
+sys.path.append(current_dir)
 get_random_seed(20230226)
 torch.backends.cudnn.deterministic = True
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -81,18 +83,29 @@ def save_results(model_name, loss_name, start, end, test_score, title, file_path
 def main():
     args = pep_config.get_config()
     print("The current task is: Multifunctional therapeutic peptides recognition")
-    models_file = f'result/{args.task}_models.txt'
+    result_dir = os.path.join(current_dir, 'result')
+    saved_models_dir = os.path.join(current_dir, 'saved_models')
+    os.makedirs(result_dir, exist_ok=True)  # 自动创建result目录
+    os.makedirs(saved_models_dir, exist_ok=True)  # 自动创建saved_models目录
+    models_file = os.path.join(result_dir, f'{args.task}_models.txt')
     Time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-    parse_file = f"result/{args.task}_pares.txt"
+    parse_file = os.path.join(result_dir, f'{args.task}_pares.txt')
     file1 = open(parse_file, 'a')
     file1.write(Time)
     file1.write('\n')
     print(args, file=file1)
     file1.write('\n')
     file1.close()
-    file_path = "{}/{}.csv".format('result', 'model_select')
+    file_path = os.path.join(result_dir, 'model_select.csv')
     print("\n Data is loading...")
+    # ====== 新增数据集路径配置 ======
+    dataset_dir = os.path.join(current_dir, 'dataset')
+    os.makedirs(dataset_dir, exist_ok=True)  # 确保dataset目录存在
+    
+    # ====== 修改数据路径指向 ======
+    args.train_direction = os.path.join(dataset_dir, 'train.txt')  # 自动生成正确路径
+    args.test_direction = os.path.join(dataset_dir, 'test.txt')
     train_datasets, test_datasets, subtests, _ = data_load(
         batch=args.batch_size,
         train_direction=args.train_direction,
@@ -137,9 +150,7 @@ def main():
 
         Train.train_step(train_dataset, args.epochs, model_name, args.alpha, args.beta)
 
-
-        PATH = os.getcwd()
-        each_model = os.path.join(PATH, 'saved_models', title_task + str(i) + '.pth')
+        each_model = os.path.join(saved_models_dir, f'{title_task}{i}.pth')
         torch.save(model.state_dict(), each_model)
 
         model_predictions, true_labels = predict(model, test_dataset, device=DEVICE)
